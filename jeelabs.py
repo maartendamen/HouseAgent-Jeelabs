@@ -91,8 +91,11 @@ class JeelabsWrapper():
         '''
         Load initial JeeLabs configuration from jeelabs.conf
         '''
+        from utils.generic import get_configurationpath
+        config_path = get_configurationpath()
+        
         config = ConfigParser.RawConfigParser()
-        config.read('jeelabs.conf')
+        config.read(os.path.join(config_path, 'jeelabs.conf'))
         self.port = config.get("serial", "port")
 
         # Get broker information (RabbitMQ)
@@ -150,13 +153,6 @@ if os.name == "nt":
             servicemanager.EVENTLOG_INFORMATION_TYPE,(self._svc_name_, ''))
     
             self.timeout=1000  # In milliseconds (update every second)
-
-            # Fix nasty path issue with Windows services.
-            # Any suggestion on how to do this better is welcome!
-            import inspect
-            path = os.path.dirname(inspect.currentframe().f_code.co_filename)
-            os.chdir(path)
-
             jeelabs = JeelabsWrapper()
             
             if jeelabs.start():
